@@ -19,6 +19,7 @@ context('Todos', () => {
 
     describe('Gerenciar Todos', () => {
         it.only('Marcar Todo como finalizado', () => {
+            cy.seed();
             cy.server()
                 .route('POST', 'http://127.0.0.1:8123/**')
                 .as('atualizar');

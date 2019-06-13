@@ -23,3 +23,9 @@
 //
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+Cypress.Commands.add('seed', () => {
+    cy.request('http://127.0.0.1:8123?seed=true').then(() => {
+        return true;
+    });
+});
