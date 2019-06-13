@@ -1,0 +1,133 @@
+<title>Olá Mundo</title>
+<style>
+    body {
+        font-family: 'Arial';
+        font-size: 14px;
+    }
+
+    .container {
+        display: flex;
+        justify-content: center;
+    }
+    ul {
+        max-width: 460px;
+        min-width: 460px;
+        margin: 0;
+        padding: 0;
+    }
+    li {
+        display: flex;
+        align-items: center;
+        padding: 0.5em;
+        border-bottom: 1px solid #ececec;
+        border-left: 1px solid #ececec;
+        border-right: 1px solid #ececec;
+    }
+    li:hover {
+        background: #efefef;
+    }
+    li:first-child {
+        border-top: 1px solid #ececec;
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+    }
+
+    li:last-child {
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+    }
+
+    input {
+        padding: 0.5em;
+        border: none;
+    }
+</style>
+<h1>Teste</h1>
+<div class="container">
+    <div>
+        <ul id="todos"></ul>
+        <button onclick="adicionarTarefa()" data-js="nova-tarefa">Nova Tarefa</button>
+    </div>
+</div>
+<script
+    src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+    crossorigin="anonymous"
+></script>
+<script>
+    const baseUrl = 'http://127.0.0.1:8123';
+    window.onload = function() {
+        carregarTodos();
+    };
+
+    function atualizarTodo(todo, event) {
+        if (event.target.getAttribute('type') === 'checkbox') {
+            todo.done = event.target.checked;
+        } else {
+            todo.title = event.target.value;
+        }
+
+        jQuery
+            .post(`${baseUrl}?id=${todo.id}`, {
+                ...todo
+            })
+            .then(result => {
+                carregarTodos();
+            });
+    }
+
+    function removerTodo(todo, event) {
+        jQuery
+            .ajax({
+                url: `${baseUrl}?id=${todo.id}`,
+                type: 'DELETE'
+            })
+            .then(result => {
+                carregarTodos();
+            });
+    }
+    function adicionarTarefa() {
+        jQuery
+            .ajax({
+                url: `${baseUrl}`,
+                type: 'PUT',
+                data: {
+                    title: '',
+                    done: false
+                }
+            })
+            .then(() => {
+                carregarTodos();
+            });
+    }
+
+    function carregarTodos() {
+        jQuery.getJSON(`${baseUrl}`).then(todos => {
+            const containerTodos = document.querySelector('#todos');
+            containerTodos.innerHTML = '';
+            todos.forEach(todo => {
+                const containerTodo = document.createElement('li');
+                const check = document.createElement('input');
+                const nome = document.createElement('input');
+                const btnRemover = document.createElement('button');
+
+                check.setAttribute('type', 'checkbox');
+                if (todo.done) {
+                    check.setAttribute('checked', 'checked');
+                }
+                nome.value = `${todo.title}`;
+                nome.setAttribute('type', 'text');
+                check.addEventListener('change', atualizarTodo.bind(this, todo));
+                nome.addEventListener('change', atualizarTodo.bind(this, todo));
+
+                btnRemover.innerText = 'Remover';
+                btnRemover.addEventListener('click', removerTodo.bind(this, todo));
+
+                containerTodo.appendChild(check);
+                containerTodo.appendChild(nome);
+                containerTodo.appendChild(btnRemover);
+                containerTodos.appendChild(containerTodo);
+            });
+        });
+    }
+</script>

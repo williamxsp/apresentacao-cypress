@@ -1,0 +1,6 @@
+{
+    "require": {
+        "cybrox/crunchdb": "^3.2",
+        "rakibtg/sleekdb": "^1.0"
+    }
+}
